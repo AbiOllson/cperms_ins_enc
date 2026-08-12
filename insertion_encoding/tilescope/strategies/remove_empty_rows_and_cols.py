@@ -28,6 +28,9 @@ class RemoveEmptyRowsAndColumnsStrategy(
         rows_and_cols = comb_class.find_empty_rows_and_columns()
         if len(rows_and_cols[0]) == 0 and len(rows_and_cols[1]) == 0:
             raise StrategyDoesNotApply("No empty rows or columns")
+        print("\nRemove empty rows and columns from tiling")
+        print(comb_class)
+        print(comb_class.remove_empty_rows_and_columns())
         return (comb_class.remove_empty_rows_and_columns(),)
 
     def extra_parameters(

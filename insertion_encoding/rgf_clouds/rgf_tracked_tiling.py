@@ -27,6 +27,7 @@ class TrackedTiling(Tiling):
         # pylint:disable=too-many-arguments
         # pylint:disable=too-many-positional-arguments
         self.rows_had_vals = rows_had_vals
+
         self.tiling = tiling
         super().__init__(
             tiling.obstructions, tiling.requirements, tiling.dimensions, simplify
@@ -70,7 +71,7 @@ class TrackedTiling(Tiling):
 
     def remove_clouds(self) -> "TrackedTiling":
         """Remove all clouds from the tracked tiling."""
-        return TrackedTiling(self.tiling)
+        return TrackedTiling(self.tiling, rows_had_vals=self.rows_had_vals)
 
     def remove_idx_cloud(self, idx_cloud: tuple[int, ...]) -> "TrackedTiling":
         """Remove an index cloud from the tracked tiling."""
@@ -81,6 +82,7 @@ class TrackedTiling(Tiling):
             self.tiling,
             indices_clouds=new_idx_clouds,
             value_clouds=self.value_clouds,
+            rows_had_vals=self.rows_had_vals,
         )
 
     def remove_val_cloud(self, val_cloud: tuple[int, ...]) -> "TrackedTiling":
@@ -92,6 +94,7 @@ class TrackedTiling(Tiling):
             self.tiling,
             indices_clouds=self.indices_clouds,
             value_clouds=new_val_clouds,
+            rows_had_vals=self.rows_had_vals,
         )
 
     def add_clouds(
@@ -114,6 +117,7 @@ class TrackedTiling(Tiling):
             self.tiling,
             indices_clouds=new_indices_clouds,
             value_clouds=new_value_clouds,
+            rows_had_vals=self.rows_had_vals,
         )
 
     @cached_property
@@ -183,10 +187,14 @@ class TrackedTiling(Tiling):
                 for cloud in self.indices_clouds
             )
         )
+        new_rows_had_vals = set(
+            row_map[row] for row in self.rows_had_vals if row not in rows
+        )
         return TrackedTiling(
             new_til,
             value_clouds=new_value_clouds,
             indices_clouds=new_indices_clouds,
+            rows_had_vals=new_rows_had_vals,
         )
 
     def remove_empty_rows_and_columns(self) -> "TrackedTiling":
@@ -208,6 +216,7 @@ class TrackedTiling(Tiling):
                 underlying,
                 indices_clouds=new_indices_clouds,
                 value_clouds=self.value_clouds,
+                rows_had_vals=self.rows_had_vals,
             )
         fuse_idx = index if index in self.point_rows else index + 1
         underlying = self.tiling.delete_rows_and_columns(cols=[], rows=[fuse_idx])
@@ -215,10 +224,14 @@ class TrackedTiling(Tiling):
             tuple(x if x <= index else x - 1 for x in cloud)
             for cloud in self.value_clouds
         ) + (new_cloud,)
+        new_rows_had_vals = set(
+            x if x <= index else x - 1 for x in self.rows_had_vals if x != fuse_idx
+        )
         return TrackedTiling(
             underlying,
             indices_clouds=self.indices_clouds,
             value_clouds=value_clouds,
+            rows_had_vals=new_rows_had_vals,
         )
 
     def is_fusable(self, fuse_rows: bool, index: int) -> bool:
@@ -243,6 +256,7 @@ class TrackedTiling(Tiling):
             indices_clouds=self.indices_clouds,
             value_clouds=self.value_clouds,
             intersect_clouds_with_active=True,
+            rows_had_vals=self.rows_had_vals,
         )
 
     def add_requirements(
@@ -259,6 +273,7 @@ class TrackedTiling(Tiling):
             ),
             indices_clouds=self.indices_clouds,
             value_clouds=self.value_clouds,
+            rows_had_vals=self.rows_had_vals,
         )
 
     def add_requirement_list(
@@ -336,16 +351,25 @@ class TrackedTiling(Tiling):
                 self.tiling == other.tiling
                 and self.indices_clouds == other.indices_clouds
                 and self.value_clouds == other.value_clouds
+                and self.rows_had_vals == other.rows_had_vals
             )
         return NotImplemented
 
     def __hash__(self):
-        return hash((hash(self.tiling), self.indices_clouds, self.value_clouds))
+        return hash(
+            (
+                hash(self.tiling),
+                self.indices_clouds,
+                self.value_clouds,
+                tuple(sorted(self.rows_had_vals)),
+            )
+        )
 
     def to_jsonable(self) -> dict:
         res = {
             "indices_clouds": [list(cloud) for cloud in self.indices_clouds],
             "value_clouds": [list(cloud) for cloud in self.value_clouds],
+            "rows_had_vals": list(self.rows_had_vals),
         }
         res.update(super().to_jsonable())
         return res
@@ -356,18 +380,21 @@ class TrackedTiling(Tiling):
             Tiling.from_dict(d),
             indices_clouds=d["indices_clouds"],
             value_clouds=d["value_clouds"],
+            rows_had_vals=set(d.get("rows_had_vals", [])),
         )
 
     def __str__(self) -> str:
         return (
             f"Tiling: \n{self.tiling}\n"
-            f"Indices clouds: {self.indices_clouds}\n"
-            f"Value clouds: {self.value_clouds},"
+            f"Indices clouds: {self.indices_clouds},\n"
+            f"Value clouds: {self.value_clouds},\n"
+            f"Rows had values: {self.rows_had_vals}"
         )
 
     def __repr__(self) -> str:
         return (
             f"TrackedTiling(tiling={repr(self.tiling)}, "
             f"indices_clouds={repr(self.indices_clouds)}, "
-            f"value_clouds={repr(self.value_clouds)})"
+            f"value_clouds={repr(self.value_clouds)}), "
+            f"rows_had_vals={repr(self.rows_had_vals)}"
         )

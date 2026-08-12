@@ -10,6 +10,7 @@ from insertion_encoding.tilescope.generic_searcher import GenericSearcher
 from .rgf_tracked_tiling import TrackedTiling
 from .pointplacement import TrackedRowPlacementFactoryRGF
 from .factoring import TrackedFactorStrategyRGF
+from clouds.strategies import TrackedFusionFactory, TrackedFusionPointRowFactory
 
 Cell = tuple[int, int]
 
@@ -28,6 +29,8 @@ class RGFTrackedSearcher(GenericSearcher):
         return StrategyPack(
             initial_strats=[
                 TrackedFactorStrategyRGF(),
+                TrackedFusionPointRowFactory(),
+                TrackedFusionFactory(),
                 # HorizontalInsertionEncodingRequirementInsertionFactory(),
             ],
             inferral_strats=[RemoveEmptyRowsAndColumnsStrategy()],

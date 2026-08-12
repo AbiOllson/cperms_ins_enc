@@ -39,9 +39,8 @@ class TrackedPointPlacementRGF(TrackedPointPlacement):
                 x, y = placed_cell
                 _, m = self.tracked_tiling.dimensions
                 for i in range(0, x + 1):
-                    for j in range(y + 1, m + 1):
+                    for j in range(y + 1, m + 2):
                         rgf_obs.add(GriddedCayleyPerm([0], [(i, j)]))
-
             tiling = self.point_placement_in_cell(
                 requirement_list, indices, direction, placed_cell
             ).add_obstructions(rgf_obs)
@@ -51,15 +50,26 @@ class TrackedPointPlacementRGF(TrackedPointPlacement):
                 value_clouds=self.tracked_tiling.value_clouds,
                 tiling_map=map_for_cells,
             )
+            rows_had_vals = self.tracked_tiling.rows_had_vals.copy()
+            rows_had_vals.add(placed_cell[1] + 1)
             all_tracked_tilings.append(
                 TrackedTiling(
                     tiling,
                     indices_clouds=indices_clouds,
                     value_clouds=value_clouds,
                     intersect_clouds_with_active=True,
-                    rows_had_vals=self.tracked_tiling.rows_had_vals.add(placed_cell[1]),
+                    rows_had_vals=rows_had_vals,
                 )
             )
+            # print(
+            #     TrackedTiling(
+            #         tiling,
+            #         indices_clouds=indices_clouds,
+            #         value_clouds=value_clouds,
+            #         intersect_clouds_with_active=True,
+            #         rows_had_vals=rows_had_vals,
+            #     )
+            # )
         return tuple(all_tracked_tilings)
 
 
@@ -72,6 +82,12 @@ class TrackedRequirementPlacementStrategyRGF(
 
     def algorithm(self, tiling):
         """Return the point placement algorithm to use for the strategy."""
+        print("\nPoint placement")
+        print(tiling)
+        for child in TrackedPointPlacementRGF(tiling).tracked_point_placement(
+            self.gcps, self.indices, self.direction
+        ):
+            print(child)
         return TrackedPointPlacementRGF(tiling)
 
 

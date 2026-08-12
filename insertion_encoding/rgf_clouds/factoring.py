@@ -38,4 +38,8 @@ class TrackedFactorStrategyRGF(
     """
 
     def algorithm(self, comb_class: TrackedTiling) -> TrackedFactorsRGF:
+        print("\nFactoring")
+        print(comb_class)
+        for child in TrackedFactorsRGF(comb_class).find_tracked_factors():
+            print(child)
         return TrackedFactorsRGF(comb_class)
