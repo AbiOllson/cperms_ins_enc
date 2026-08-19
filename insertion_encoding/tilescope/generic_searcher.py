@@ -41,20 +41,6 @@ class GenericSearcher(abc.ABC):
     def pack(self):
         """Returns the strategy pack."""
 
-    @cached_property
-    def comb_spec_searcher(self) -> CombinatorialSpecificationSearcher:
-        """Returns the CombinatorialSpecificationSearcher object for this searcher."""
-        print(self.pack(), self.pack().name)
-        return CombinatorialSpecificationSearcher(
-            self.start_class(), self.pack(), debug=self.debug
-        )
-
-    def auto_search(self, max_expansion_time=600) -> CombinatorialSpecification:
-        """Search for a specification."""
-        return self.comb_spec_searcher.auto_search(
-            max_expansion_time=max_expansion_time
-        )
-
 
 class GenericTilingsSearcher(GenericSearcher):
     """A generic searcher for methods which use tilings."""

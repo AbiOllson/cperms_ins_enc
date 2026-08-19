@@ -61,15 +61,6 @@ class TrackedPointPlacementRGF(TrackedPointPlacement):
                     rows_had_vals=rows_had_vals,
                 )
             )
-            # print(
-            #     TrackedTiling(
-            #         tiling,
-            #         indices_clouds=indices_clouds,
-            #         value_clouds=value_clouds,
-            #         intersect_clouds_with_active=True,
-            #         rows_had_vals=rows_had_vals,
-            #     )
-            # )
         return tuple(all_tracked_tilings)
 
 
@@ -82,12 +73,6 @@ class TrackedRequirementPlacementStrategyRGF(
 
     def algorithm(self, tiling):
         """Return the point placement algorithm to use for the strategy."""
-        print("\nPoint placement")
-        print(tiling)
-        for child in TrackedPointPlacementRGF(tiling).tracked_point_placement(
-            self.gcps, self.indices, self.direction
-        ):
-            print(child)
         return TrackedPointPlacementRGF(tiling)
 
 
@@ -98,8 +83,7 @@ class TrackedRowPlacementFactoryRGF(TrackedRowPlacementFactory):
     def __call__(
         self, comb_class: TrackedTiling
     ) -> Iterator[TrackedRequirementPlacementStrategyRGF]:
-        not_point_rows = set(range(comb_class.dimensions[1])) - comb_class.point_rows
-        for row in not_point_rows:
+        for row in set(range(comb_class.dimensions[1])):
             all_gcps = []
             for col in range(comb_class.dimensions[0]):
                 cell = (col, row)
