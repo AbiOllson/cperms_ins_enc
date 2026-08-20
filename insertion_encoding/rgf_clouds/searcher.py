@@ -12,7 +12,12 @@ from clouds.strategies import (
     TrackedFusionPointRowFactory,
     TrackedRemoveEmptyRowsAndColumnsStrategy,
 )
+
 from insertion_encoding.rgf_clouds.tracked_searcher import TrackedSearcher
+from insertion_encoding.rgf_clouds.rc_sep import (
+    TrackedLessThanOrEqualRowColSeparationFactory,
+    TrackedLessThanRowColSeparationStrategy,
+)
 from functools import cached_property
 
 Cell = tuple[int, int]
@@ -32,11 +37,14 @@ class RGFTrackedSearcher(GenericSearcher):
         return StrategyPack(
             initial_strats=[
                 TrackedFactorStrategyRGF(),
+                TrackedLessThanOrEqualRowColSeparationFactory(),
                 TrackedFusionPointRowFactory(),
                 TrackedFusionFactory(),
-                # HorizontalInsertionEncodingRequirementInsertionFactory(),
             ],
-            inferral_strats=[TrackedRemoveEmptyRowsAndColumnsStrategy()],
+            inferral_strats=[
+                TrackedRemoveEmptyRowsAndColumnsStrategy(),
+                # TrackedLessThanRowColSeparationStrategy(),
+            ],
             expansion_strats=[[TrackedRowPlacementFactoryRGF()]],
             ver_strats=[AtomStrategy()],
             name="RGF Fusion Insertion Encoding",
