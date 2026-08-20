@@ -50,7 +50,12 @@ class TrackedPointPlacementRGF(TrackedPointPlacement):
                 value_clouds=self.tracked_tiling.value_clouds,
                 tiling_map=map_for_cells,
             )
-            rows_had_vals = self.tracked_tiling.rows_had_vals.copy()
+            row_map = map_for_cells.preimage_map()[1]
+            rows_had_vals = set(
+                row_map[row][0]
+                for row in self.tracked_tiling.rows_had_vals
+                if row != placed_row
+            )
             rows_had_vals.add(placed_cell[1] + 1)
             all_tracked_tilings.append(
                 TrackedTiling(
