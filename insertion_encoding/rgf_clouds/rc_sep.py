@@ -172,7 +172,7 @@ class RGFTrackedLessThanOrEqualRowColSeparationStrategy(
         return RGFTrackedLessThanOrEqualRowColSeparation(comb_class, self.row_order)
 
 
-class TrackedLessThanOrEqualRowColSeparationFactory(
+class RGFTrackedLessThanOrEqualRowColSeparationFactory(
     AbstractLessThanOrEqualRowColSeparationFactory
 ):
     """A factory for creating strategies for separating rows and columns

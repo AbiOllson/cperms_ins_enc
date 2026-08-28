@@ -15,8 +15,8 @@ from clouds.strategies import (
 
 from insertion_encoding.rgf_clouds.tracked_searcher import TrackedSearcher
 from insertion_encoding.rgf_clouds.rc_sep import (
-    TrackedLessThanOrEqualRowColSeparationFactory,
-    TrackedLessThanRowColSeparationStrategy,
+    RGFTrackedLessThanOrEqualRowColSeparationFactory,
+    RGFTrackedLessThanRowColSeparationStrategy,
 )
 from functools import cached_property
 
@@ -37,13 +37,13 @@ class RGFTrackedSearcher(GenericSearcher):
         return StrategyPack(
             initial_strats=[
                 TrackedFactorStrategyRGF(),
-                TrackedLessThanOrEqualRowColSeparationFactory(),
+                RGFTrackedLessThanOrEqualRowColSeparationFactory(),
                 TrackedFusionPointRowFactory(),
                 TrackedFusionFactory(),
             ],
             inferral_strats=[
                 TrackedRemoveEmptyRowsAndColumnsStrategy(),
-                # TrackedLessThanRowColSeparationStrategy(),
+                RGFTrackedLessThanRowColSeparationStrategy(),
             ],
             expansion_strats=[[TrackedRowPlacementFactoryRGF()]],
             ver_strats=[AtomStrategy()],
