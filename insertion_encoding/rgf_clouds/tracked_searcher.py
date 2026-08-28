@@ -41,12 +41,12 @@ class TrackedSearcher(CombinatorialSpecificationSearcher):
         **kwargs,
     ) -> None:
         start_tiling = self._start_tiling(start_class)
-        if start_tiling.dimensions == (1, 1):
-            basis = [o.pattern for o in start_tiling.obstructions]
-            try:
-                strategy_pack = strategy_pack.add_basis(basis)
-            except NotImplementedError:
-                logger.warning("Could not add basis to strategy pack.")
+        # if start_tiling.dimensions == (1, 1):
+        #     basis = [o.pattern for o in start_tiling.obstructions]
+        #     try:
+        #         strategy_pack = strategy_pack.add_basis(basis)
+        #     except NotImplementedError:
+        #         logger.warning("Could not add basis to strategy pack.")
         self.max_cvs = max_cvs
         super().__init__(
             start_tiling,
