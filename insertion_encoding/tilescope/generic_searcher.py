@@ -5,6 +5,7 @@ from functools import cached_property
 from comb_spec_searcher import (
     CombinatorialSpecificationSearcher,
     CombinatorialSpecification,
+    StrategyPack,
 )
 from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import string_to_basis
@@ -26,7 +27,7 @@ class GenericSearcher(abc.ABC):
             )
 
     @abc.abstractmethod
-    def type_of_encoding(self):
+    def type_of_encoding(self) -> str:
         """Returns the type of encoding."""
 
     @abc.abstractmethod
@@ -34,11 +35,11 @@ class GenericSearcher(abc.ABC):
         """Returns the starting class - a tiling or configuration avoiding a basis."""
 
     @abc.abstractmethod
-    def regular_check(self):
+    def regular_check(self) -> bool:
         """Checks if the class can be enumerated with the given insertion encoding."""
 
     @abc.abstractmethod
-    def pack(self):
+    def pack(self) -> "StrategyPack":
         """Returns the strategy pack."""
 
 

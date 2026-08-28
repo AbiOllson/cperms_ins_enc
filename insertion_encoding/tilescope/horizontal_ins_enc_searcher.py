@@ -34,7 +34,7 @@ class HorizontalSearcher(GenericTilingsSearcher):
     def regular_check(self):
         return regular_horizontal_insertion_encoding(self.basis)
 
-    def type_of_encoding(self):
+    def type_of_encoding(self) -> str:
         return "horizontal"
 
     def pack(self):
@@ -59,7 +59,7 @@ class RGFHorizontalSearcher(HorizontalSearcher):
     def regular_check(self):
         return rgf_regular_horizontal_insertion_encoding(self.basis)
 
-    def type_of_encoding(self):
+    def type_of_encoding(self) -> str:
         return "RGF horizontal"
 
     def pack(self):
@@ -81,7 +81,7 @@ class MatchingHorizontalSearcher(RGFHorizontalSearcher):
     """A searcher for the horizontal insertion encoding for
     enumerating restricted growth functions."""
 
-    def type_of_encoding(self):
+    def type_of_encoding(self) -> str:
         return "RGFs of matchings horizontal"
 
     def pack(self):
