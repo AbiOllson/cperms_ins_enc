@@ -1,3 +1,3 @@
-from .searcher import RGFTrackedSearcher
+from .searcher import RGFTrackedSearcher, RGFRCSepSearcher
 
-__all__ = ["RGFTrackedSearcher"]
+__all__ = ["RGFTrackedSearcher", "RGFRCSepSearcher"]

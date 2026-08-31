@@ -23,23 +23,21 @@ from functools import cached_property
 Cell = tuple[int, int]
 
 
-class RGFTrackedSearcher(GenericSearcher):
-    """A searcher for the horizontal insertion encoding for
+class RGFRCSepSearcher(GenericSearcher):
+    """A searcher with rc sep for
     enumerating restricted growth functions."""
 
     def regular_check(self):
         return True
 
     def type_of_encoding(self):
-        return "RGF fusion"
+        return "RGF rc sep"
 
     def pack(self):
         return StrategyPack(
             initial_strats=[
                 TrackedFactorStrategyRGF(),
                 RGFTrackedLessThanOrEqualRowColSeparationFactory(),
-                TrackedFusionPointRowFactory(),
-                TrackedFusionFactory(),
             ],
             inferral_strats=[
                 TrackedRemoveEmptyRowsAndColumnsStrategy(),
@@ -47,7 +45,7 @@ class RGFTrackedSearcher(GenericSearcher):
             ],
             expansion_strats=[[TrackedRowPlacementFactoryRGF()]],
             ver_strats=[AtomStrategy()],
-            name="RGF Fusion Insertion Encoding",
+            name="RGF RC Sep Insertion Encoding",
             symmetries=[],
             iterative=False,
         )
@@ -72,4 +70,31 @@ class RGFTrackedSearcher(GenericSearcher):
         """Search for a specification."""
         return self.comb_spec_searcher.auto_search(
             max_expansion_time=max_expansion_time
+        )
+
+
+class RGFTrackedSearcher(RGFRCSepSearcher):
+    """A searcher with rc sep and fusion for
+    enumerating restricted growth functions."""
+
+    def type_of_encoding(self):
+        return "RGF fusion"
+
+    def pack(self):
+        return StrategyPack(
+            initial_strats=[
+                TrackedFactorStrategyRGF(),
+                RGFTrackedLessThanOrEqualRowColSeparationFactory(),
+                TrackedFusionPointRowFactory(),
+                TrackedFusionFactory(),
+            ],
+            inferral_strats=[
+                TrackedRemoveEmptyRowsAndColumnsStrategy(),
+                RGFTrackedLessThanRowColSeparationStrategy(),
+            ],
+            expansion_strats=[[TrackedRowPlacementFactoryRGF()]],
+            ver_strats=[AtomStrategy()],
+            name="RGF Fusion Insertion Encoding",
+            symmetries=[],
+            iterative=False,
         )
