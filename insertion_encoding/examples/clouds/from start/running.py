@@ -7,20 +7,20 @@ import json
 
 type_of_bases = ["3s", "3s_4x2", "3s_4x1", "4s_updated"]
 
-bases_running = [
-    (CayleyPermutation((0, 0, 0)), CayleyPermutation((0, 1, 0, 1))),
-    "Av(0102)",
-    "Av(0012)",
-    "Av(0101)",
-    "Av(0011)",
-]
+# bases_running = [
+#     (CayleyPermutation((0, 0, 0)), CayleyPermutation((0, 1, 0, 1))),
+#     "Av(0102)",
+#     "Av(0012)",
+#     "Av(0101)",
+#     "Av(0011)",
+# ]
 
 took_too_long = []
 tot_found = 0
 
 for basis_type in type_of_bases:
     with open(f"all_non_inenc_basis_classes_{basis_type}.txt", "r") as f:
-        bases = eval(f.read())
+        bases = sorted(eval(f.read()))[40:]
 
     print(len(bases))
     for basis in bases:

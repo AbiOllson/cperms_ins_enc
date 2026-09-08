@@ -115,14 +115,14 @@ found_before = set()
 
 for basis in bases:
     try:
-        with open(f"1cv specs rc sep\{CanonicalAv(basis)}.json", "r") as f:
+        with open(f"1 min run\{CanonicalAv(basis)}.json", "r") as f:
             spec = CombinatorialSpecification.from_dict(json.load(f))
         found_before.add(basis)
         continue
     except FileNotFoundError:
 
         try:
-            spec = RGFTrackedSearcher(basis).auto_search(max_expansion_time=1200)
+            spec = RGFTrackedSearcher(basis).auto_search(max_expansion_time=60)
         except ExceededMaxtimeError:
             print(f"Basis {CanonicalAv(basis)} took too long")
             took_too_long.add(basis)
@@ -141,8 +141,9 @@ for basis in bases:
                 f.write(json.dumps(spec.to_jsonable()))
         else:
             correct_counts.add(basis)
-            with open(f"1cv specs rc sep\{CanonicalAv(basis)}.json", "w") as f:
+            with open(f"1 min run\{CanonicalAv(basis)}.json", "w") as f:
                 f.write(json.dumps(spec.to_jsonable()))
+    print("found before", len(found_before))
     print(
         len(correct_counts),
         " correct counts\n",
@@ -150,6 +151,7 @@ for basis in bases:
         " incorrect counts",
     )
     print(len(took_too_long), " took too long")
+
 
 print("correct counts")
 print(correct_counts)
