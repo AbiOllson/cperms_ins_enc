@@ -98,3 +98,53 @@ class RGFTrackedSearcher(RGFRCSepSearcher):
             symmetries=[],
             iterative=False,
         )
+
+
+class RGFRCSepHoriSearcher(GenericSearcher):
+    """A searcher with rc sep for
+    enumerating restricted growth functions."""
+
+    def regular_check(self):
+        return True
+
+    def type_of_encoding(self):
+        return "RGF rc sep"
+
+    def pack(self):
+        return StrategyPack(
+            initial_strats=[
+                TrackedFactorStrategyRGF(),
+                RGFTrackedLessThanOrEqualRowColSeparationFactory(),
+            ],
+            inferral_strats=[
+                TrackedRemoveEmptyRowsAndColumnsStrategy(),
+                RGFTrackedLessThanRowColSeparationStrategy(),
+            ],
+            expansion_strats=[[TrackedColPlacementFactoryRGF()]],
+            ver_strats=[AtomStrategy()],
+            name="RGF RC Sep Insertion Encoding",
+            symmetries=[],
+            iterative=False,
+        )
+
+    def start_class(self):
+        til = Tiling(
+            [GriddedCayleyPerm(p, [(0, 0) for _ in p]) for p in self.basis],
+            [],
+            (1, 1),
+        )
+        return TrackedTiling(til)
+
+    @cached_property
+    def comb_spec_searcher(self) -> TrackedSearcher:
+        """Returns the CombinatorialSpecificationSearcher object for this searcher."""
+        print(self.pack(), self.pack().name)
+        return TrackedSearcher(
+            self.start_class(), self.pack(), debug=self.debug, max_cvs=1
+        )
+
+    def auto_search(self, max_expansion_time=600) -> TrackedSearcher:
+        """Search for a specification."""
+        return self.comb_spec_searcher.auto_search(
+            max_expansion_time=max_expansion_time
+        )

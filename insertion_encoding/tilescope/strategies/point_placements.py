@@ -18,7 +18,6 @@ from gridded_cayley_permutations.point_placements import (
 )
 from cayley_permutations import CayleyPermutation
 
-
 Cell = Tuple[int, int]
 
 
