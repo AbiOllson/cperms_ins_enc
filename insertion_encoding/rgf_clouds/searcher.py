@@ -3,9 +3,14 @@ from comb_spec_searcher import (
     StrategyPack,
     AtomStrategy,
 )
-from insertion_encoding.tilescope.generic_searcher import GenericSearcher
+from insertion_encoding.tilescope.generic_searcher import GenericTilingsSearcher
 from .rgf_tracked_tiling import TrackedTiling
-from .pointplacement import TrackedRowPlacementFactoryRGF
+
+from .pointplacement import TrackedVPointPlacementFactoryRGF
+
+from .hori_point_placement import TrackedHReqPlacementFactoryRGF
+
+# from .pointplacement import TrackedVPointPlacementFactoryRGF
 from .factoring import TrackedFactorStrategyRGF
 from clouds.strategies import (
     TrackedFusionFactory,
@@ -23,7 +28,7 @@ from functools import cached_property
 Cell = tuple[int, int]
 
 
-class RGFRCSepSearcher(GenericSearcher):
+class RGFVRCSepSearcher(GenericTilingsSearcher):
     """A searcher with rc sep for
     enumerating restricted growth functions."""
 
@@ -31,7 +36,7 @@ class RGFRCSepSearcher(GenericSearcher):
         return True
 
     def type_of_encoding(self):
-        return "RGF rc sep"
+        return "RGF vertical rc sep"
 
     def pack(self):
         return StrategyPack(
@@ -43,9 +48,9 @@ class RGFRCSepSearcher(GenericSearcher):
                 TrackedRemoveEmptyRowsAndColumnsStrategy(),
                 RGFTrackedLessThanRowColSeparationStrategy(),
             ],
-            expansion_strats=[[TrackedRowPlacementFactoryRGF()]],
+            expansion_strats=[[TrackedVPointPlacementFactoryRGF()]],
             ver_strats=[AtomStrategy()],
-            name="RGF RC Sep Insertion Encoding",
+            name="RGF RC Sep Vertical Insertion Encoding",
             symmetries=[],
             iterative=False,
         )
@@ -58,27 +63,13 @@ class RGFRCSepSearcher(GenericSearcher):
         )
         return TrackedTiling(til)
 
-    @cached_property
-    def comb_spec_searcher(self) -> TrackedSearcher:
-        """Returns the CombinatorialSpecificationSearcher object for this searcher."""
-        print(self.pack(), self.pack().name)
-        return TrackedSearcher(
-            self.start_class(), self.pack(), debug=self.debug, max_cvs=1
-        )
 
-    def auto_search(self, max_expansion_time=600) -> TrackedSearcher:
-        """Search for a specification."""
-        return self.comb_spec_searcher.auto_search(
-            max_expansion_time=max_expansion_time
-        )
-
-
-class RGFTrackedSearcher(RGFRCSepSearcher):
+class RGFVTrackedSearcher(RGFVRCSepSearcher):
     """A searcher with rc sep and fusion for
     enumerating restricted growth functions."""
 
     def type_of_encoding(self):
-        return "RGF fusion"
+        return "RGF vertical fusion"
 
     def pack(self):
         return StrategyPack(
@@ -92,15 +83,15 @@ class RGFTrackedSearcher(RGFRCSepSearcher):
                 TrackedRemoveEmptyRowsAndColumnsStrategy(),
                 RGFTrackedLessThanRowColSeparationStrategy(),
             ],
-            expansion_strats=[[TrackedRowPlacementFactoryRGF()]],
+            expansion_strats=[[TrackedVPointPlacementFactoryRGF()]],
             ver_strats=[AtomStrategy()],
-            name="RGF Fusion Insertion Encoding",
+            name="RGF Fusion Vertical Insertion Encoding",
             symmetries=[],
             iterative=False,
         )
 
 
-class RGFRCSepHoriSearcher(GenericSearcher):
+class RGFRCSepHoriSearcher(RGFVRCSepSearcher):
     """A searcher with rc sep for
     enumerating restricted growth functions."""
 
@@ -108,7 +99,7 @@ class RGFRCSepHoriSearcher(GenericSearcher):
         return True
 
     def type_of_encoding(self):
-        return "RGF rc sep"
+        return "RGF horizontal rc sep"
 
     def pack(self):
         return StrategyPack(
@@ -120,31 +111,36 @@ class RGFRCSepHoriSearcher(GenericSearcher):
                 TrackedRemoveEmptyRowsAndColumnsStrategy(),
                 RGFTrackedLessThanRowColSeparationStrategy(),
             ],
-            expansion_strats=[[TrackedColPlacementFactoryRGF()]],
+            expansion_strats=[[TrackedHReqPlacementFactoryRGF()]],
             ver_strats=[AtomStrategy()],
-            name="RGF RC Sep Insertion Encoding",
+            name="RGF RC Sep Horizontal Insertion Encoding",
             symmetries=[],
             iterative=False,
         )
 
-    def start_class(self):
-        til = Tiling(
-            [GriddedCayleyPerm(p, [(0, 0) for _ in p]) for p in self.basis],
-            [],
-            (1, 1),
-        )
-        return TrackedTiling(til)
 
-    @cached_property
-    def comb_spec_searcher(self) -> TrackedSearcher:
-        """Returns the CombinatorialSpecificationSearcher object for this searcher."""
-        print(self.pack(), self.pack().name)
-        return TrackedSearcher(
-            self.start_class(), self.pack(), debug=self.debug, max_cvs=1
-        )
+class RGFHTrackedSearcher(RGFRCSepHoriSearcher):
+    """A searcher with rc sep and fusion for
+    enumerating restricted growth functions."""
 
-    def auto_search(self, max_expansion_time=600) -> TrackedSearcher:
-        """Search for a specification."""
-        return self.comb_spec_searcher.auto_search(
-            max_expansion_time=max_expansion_time
+    def type_of_encoding(self):
+        return "RGF horizontal fusion"
+
+    def pack(self):
+        return StrategyPack(
+            initial_strats=[
+                TrackedFactorStrategyRGF(),
+                RGFTrackedLessThanOrEqualRowColSeparationFactory(),
+                TrackedFusionPointRowFactory(),
+                TrackedFusionFactory(),
+            ],
+            inferral_strats=[
+                TrackedRemoveEmptyRowsAndColumnsStrategy(),
+                RGFTrackedLessThanRowColSeparationStrategy(),
+            ],
+            expansion_strats=[[TrackedHReqPlacementFactoryRGF()]],
+            ver_strats=[AtomStrategy()],
+            name="RGF Fusion Horizontal Insertion Encoding",
+            symmetries=[],
+            iterative=False,
         )
