@@ -90,7 +90,7 @@ class TrackedRGFVPointPlacement(RGFVPointPlacement):
         cells = set()
         for idx, gcp in zip(indices, requirement_list):
             cells.add(gcp.positions[idx])
-        return cells
+        return sorted(cells)
 
     def tracked_point_placement(
         self,

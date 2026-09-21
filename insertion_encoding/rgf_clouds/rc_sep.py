@@ -1,6 +1,7 @@
 """Strategies for row and column separation in tracked tilings."""
 
 from typing import Iterator, Optional, Iterable
+from gridded_cayley_permutations import GriddedCayleyPerm
 from tilescope.strategies import (
     AbstractLessThanOrEqualRowColSeparationFactory,
 )
@@ -93,6 +94,7 @@ class RGFTrackedLessThanOrEqualRowColSeparation(
     ) -> None:
         self.tracked_tiling = tracked_tiling
         self.rows_had_vals = tracked_tiling.rows_had_vals
+
         super().__init__(tracked_tiling.tiling, row_order=row_order)
 
     def tracked_row_col_separation(
@@ -142,10 +144,18 @@ class RGFTrackedLessThanOrEqualRowColSeparation(
                         if cell1[1] in self.rows_had_vals:
                             less_than_row.add((cell2, cell1))
                     if ob.pattern == CayleyPermutation([1, 0]):
-                        if (cell2, cell1) in less_than_row:
+                        if (cell2, cell1) in less_than_row or GriddedCayleyPerm(
+                            CayleyPermutation([0, 1]), (cell2, cell1)
+                        ) in self.tracked_tiling.tiling.obstructions:
                             less_than_row.remove((cell2, cell1))
                         else:
-                            less_than_row.add((cell1, cell2))
+                            if (
+                                GriddedCayleyPerm(
+                                    CayleyPermutation([0, 1]), (cell1, cell2)
+                                )
+                                not in self.tracked_tiling.tiling.obstructions
+                            ):
+                                less_than_row.add((cell1, cell2))
                     if ob.pattern == CayleyPermutation([0, 0]):
                         not_equal.add((cell1, cell2))
                         not_equal.add((cell2, cell1))
@@ -190,6 +200,7 @@ class RGFTrackedLessThanOrEqualRowColSeparationFactory(
         """Finds max expansion and if any row separates more than 2 cells then
         it merges them together so that each row splits into at most 2 rows
         (plus a point row between them) and yields all possible ways of doing this."""
+
         for row_order in self.row_separations(comb_class):
             yield RGFTrackedLessThanOrEqualRowColSeparationStrategy(
                 row_order=row_order,
